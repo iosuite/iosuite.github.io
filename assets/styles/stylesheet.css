@@ -244,6 +244,10 @@ h1 {
   font-size: 32px;
 }
 
+h1 label {
+	margin-left: 10px;
+}
+
 h2 {
   margin-bottom: 8px;
   font-size: 22px;
@@ -339,11 +343,62 @@ footer a:hover {
 * html .clearfix {height: 1%;}
 .clearfix {display: block;}
 
+
+
+#cssmenu {
+  background: #333;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  width: 12em;
+  position: fixed;
+  top: 15%;
+  left: 0;
+  text-shadow: none;
+}
+#cssmenu li {
+  font-size: 14px; /*"Lucida Sans Unicode", "Bitstream Vera Sans", "Trebuchet Unicode MS", "Lucida Grande", Verdana, Helvetica, sans-serif*/
+  letter-spacing: 1px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+#cssmenu a {
+  background: #333;
+  border-bottom: 1px solid #393939;
+  color: #ccc;
+  display: block;
+  margin: 0;
+  padding: 8px 12px 8px 0;
+  text-decoration: none;
+  font-weight: normal;
+}
+#cssmenu a span {
+	margin-left: 10px;
+}
+#cssmenu a:hover,
+#cssmenu li.active a {
+  background: #2580a2 url("../images/hover.gif") left center no-repeat;
+  color: #fff;
+  padding-bottom: 8px;
+}
+
+
 /* #Media Queries
 ================================================== */
 
 /* Smaller than standard 960 (devices and browsers) */
-@media only screen and (max-width: 959px) { }
+@media only screen and (max-width: 1024px) {
+	#cssmenu {
+		position: relative;
+		float: left;
+		top: 40px;
+	}
+	.inner {
+		float:left;
+		margin-left: 15px;
+	}
+}
 
 /* Tablet Portrait size to standard 960 (devices and browsers) */
 @media only screen and (min-width: 768px) and (max-width: 959px) { }
@@ -363,6 +418,9 @@ footer a:hover {
   .inner {
     width: 94%;
     margin: 0 auto;
+  }
+  #cssmenu {
+  	top: 0;
   }
 }
 
