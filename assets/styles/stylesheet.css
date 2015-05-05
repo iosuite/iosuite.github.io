@@ -33,6 +33,10 @@ body {
 ol, ul {
 	list-style: none;
 }
+
+ol {
+	margin-left: 25px;
+}
 blockquote, q {
 	quotes: none;
 }
@@ -82,6 +86,10 @@ header h2 {
   line-height: 1.3;
   color: #aaa;
   letter-spacing: -1px;
+}
+
+section {
+	min-height: 400px;
 }
 
 #container {
@@ -397,6 +405,10 @@ footer a:hover {
 	.inner {
 		float:left;
 		margin-left: 15px;
+	}
+
+	section {
+		min-height: auto;
 	}
 }
 

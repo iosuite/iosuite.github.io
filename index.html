@@ -38,7 +38,7 @@
 				</header>
 
 				<section id="downloads" class="clearfix">
-					<a href="https://github.com/iosuite" id="view-on-github" class="button"><span>View on GitHub</span></a>
+					<a href="https://github.com/iosuite/iosuite.git" id="view-on-github" class="button" target="_blank"><span>View on GitHub</span></a>
 				</section>
 
 				<hr>
@@ -49,28 +49,111 @@
 						<span class="mega-octicon octicon-cloud-download"></span><label>Installation</label>
 					</h1>
 
-					<h2>
-						Vagrantfile
-					</h2>
+					<h2>Local Development</h2>
+					<ol>
+						<li>Locate and install the iosuite Framework Bundle from the NetSuite bundle library (Bundle #76421)</li>
+						<li>Clone the <a href="http://githib.com/iosuite/" target="_blank">iosuite</a> framework from GitHub.com</li>
+						<li>Install <a href="http://virtualbox.org" target="_blank">Virtual Box</a> and <a href="http://vagrantup.com" target="_blank">Vagrant</a></li>
+						<li>Register for an <a href="http://ngrok.com" target="_blank">ngrok.com</a> account and note the Authentication Key</li>
+					</ol>
 
-					<p>The Vagrantfile installs a base io.js server to have a local environment. NPM is installed first then installs the package "ny" to manage iojs versions. The io.js version will be the latest stable release.</p>
 
-					<p>In order for NetSuite to be able to see your local environment you must route incoming requests to your ip address to your local machine. By default, the VM is looking for connections through the 8080 port and the 8888 port. A self signed certificate is installed on this server so you can access https://{{yourip}}:8888 (the default secure port is 8888 for the iosuite server).</p>
+					<h4>Vagrant Setup</h4>
+					<ol>
+						<li>Open up a command line tool</li>
+						<li>Change directory into the cloned iosuite directory</li>
+						<li>Type the command <code>vagrant up</code></li>
+						<li>After the process has completed, type <code>vagrant ssh</code> to login to the virtual box</li>
+						<li>Change directory into "/var/www/iosuite"</li>
+						<li>Setup the ngrok authentication token by following <a href="https://ngrok.com/docs#authtoken" target="_blank">these instructions</a></li>
+						<li>Launch your application by typing <code>forever start iosuite.js</code></li>
+						<li>Launch ngrok with a <a href="https://ngrok.com/docs#http" target="_blank">custom domain</a> to start tunneling your localhost, it is recommended that you visit your ngrok url to confirm the server is working</li>
+						<li>Add the custom domain to the iosuite Users record type in NetSuite, installed from the Bundle, make sure you select your user and don't check "Is Production" or "Is Staging". Be sure to include "https://" to the URL</li>
+						<li>Visit <a href="https://system.sandbox.netsuite.com/app/site/hosting/scriptlet.nl?script=customscript_master_suitelet&deploy=1&suitelet=sample" target="_blank">the sample suitelet</a> to get started</li>
+					</ol>
+
+					<h2>Staging/Production Setup Considerations</h2>
+					<ol>
+						<li>The steps for Staging / Production very by desired server setup</li>
+						<li>io.js must be installed and configured on the server</li>
+						<li>A valid https certificate is required for NetSuite to properly work</li>
+						<li>A single entry should be added to the iosuite Users record type that has the server url and "Is Staging" or "Is Production" checked</li>
+					</ol>
+
+					
 				</section>
+
+				<hr>
 
 				<section id="useage">
 
 					<h1>
-						<span class="mega-octicon octicon-link"></span><label>Useage</label>
+						<span class="mega-octicon octicon-checklist"></span><label>Useage</label>
 					</h1>
 
-					<p>Here is how to use</p>
+					<p>The iosuite Framework uses a strict coding standard based off of a traditional class based structure. To see an example, check out the sample suitelet provided. This includes a Client Script and a Restlet. Below is a sample of the structure</p>
+
+					<p>
+						<pre>
+(function(){
+
+	var private = {};
+
+	public.libraries.global = {{library:global}};
+
+	public.load = function( dataIn ) {
+		
+		var response = '',
+			context = nlapiGetContext(),
+			html = {{template:sample}},
+			tags = {},
+			employeeFilters = [],
+			employeeColumns = [],
+			employeeRecord;
+
+		/*
+		 *  Set Filters and Columns
+		 */
+		employeeFilters.push( new nlobjSearchFilter('internalid', null, 'is', context.getUser() ) );
+		employeeColumns.push( new nlobjSearchColumn('title') );
+		try {
+			employeeRecord = nlapiSearchRecord('employee', null, employeeFilters, employeeColumns);
+		} catch(error) {
+			public.libraries.global.handleError( error, 'ERROR' );
+		}
+
+		tags.company = context.getCompany();
+		tags.environment = context.getEnvironment();
+		tags.version = context.getVersion();
+		tags.email = context.getEmail();
+		tags.username = context.getName();
+		tags.jobtitle = employeeRecord[0].getValue('title') || 'Not Set';
+		tags.userid = context.getUser();
+
+		response = public.libraries.global.mapTags( html, tags );
+
+		return response;
+
+	};
+
+	return public;
+
+})();
+						</pre>
+					</p>
+
+					<p>The above piece of code is wrapped inside of a self executing function using the (function(){})(); notation. At the beginning there is a local scoped private variable set, where the public variable has been declared and used in the master control file. Then the Suitelet <code>load()</code> method is declared.</p>
+					<p>It is important to node, there are specific methods that MUST be declared in order for the Suitelet/Restlet to work. For Suitelets it's public.load(), for RESTlets it is public.createCall(), public.readCall(), public.updateCall(), and public.deleteCall();</p>
+					<p>Other methods are declared but have not been enabled on the live iosuite branch</p>
+					<p>iosuite comes with several templating systems. The first one allows you to declare libraries, html/css/js calls, among other things. The second is the global library, the global library allows for templating inside of an HTML file. See the sample suitelet for a use case</p>
 				</section>
+
+				<hr>
 
 				<section id="contact">
 
 					<h1>
-						<span class="mega-octicon octicon-mail"></span><label>Contact TJ Tyrrell</label>
+						<span class="mega-octicon octicon-mail"></span><label>Reach TJ Tyrrell</label>
 					</h1>
 
 					<div id="contact_form">
@@ -82,6 +165,8 @@
 					</div>
 				</section>
 
+				<hr>
+
 				<section id="license">
 					<h1>
 						<span class="mega-octicon octicon-file-text"></span><label>License</label>
@@ -89,7 +174,7 @@
 
 					<p>The MIT License (MIT)</p>
 
-					<p>Copyright (c) 2015 SRS Acquiom
+					<p>Copyright (c) 2015 <a href="http://srsacquiom.com" target="_blank">SRS Acquiom</a>
 
 					<p>Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:</p>
 
@@ -98,11 +183,8 @@
 					<p>THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</p>
 
 					<p>Except as contained in this notice, the name(s) of the above copyright holders shall not be used in advertising or otherwise to promote the sale, use or other dealings in this Software without prior written authorization.</p>
+					<section></section>
 				</section>
-
-				<footer>
-					
-				</footer>
 
 				<script type="text/javascript">
 					var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
